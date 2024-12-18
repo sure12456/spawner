@@ -19,14 +19,14 @@ function main() {
         let driver = yield new selenium_webdriver_1.Builder().forBrowser(selenium_webdriver_1.Browser.CHROME).setChromeOptions(options).build();
         try {
             yield driver.get('https://meet.google.com/yrm-pvbi-ohk?hs=193&hs=187&ijlm=1734417497293&adhoc=1');
-            console.log("Site opened");
-            yield driver.sleep(6000);
-            console.log("Passed here.");
-            const text = yield driver.findElement(selenium_webdriver_1.By.id('c11')).sendKeys("Testing", selenium_webdriver_1.Key.ENTER);
-            yield driver.sleep(6000);
-            // if (text) {
-            //   console.log("This is text : ", text)
-            // }
+            // await driver.sleep(6000)
+            // await driver.findElement(By.id('c11')).sendKeys("Testing")
+            yield driver.wait(selenium_webdriver_1.until.elementLocated(selenium_webdriver_1.By.xpath('//span[contains(text(), "Got it")]')), 10000).click();
+            yield driver.wait(selenium_webdriver_1.until.elementLocated(selenium_webdriver_1.By.id('c11')), 10000).sendKeys("Testing1");
+            yield driver.wait(selenium_webdriver_1.until.elementLocated(selenium_webdriver_1.By.xpath('//input[@id="c11"]')), 10000).sendKeys("Testing2");
+            yield driver.wait(selenium_webdriver_1.until.elementLocated(selenium_webdriver_1.By.xpath('//input[@placeholder="Your name"]')), 10000).sendKeys("Testing3");
+            yield driver.sleep(600000);
+            //*[@id="c11"]
         }
         finally {
             yield driver.quit();
