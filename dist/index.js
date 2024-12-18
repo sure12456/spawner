@@ -15,11 +15,18 @@ function main() {
     return __awaiter(this, void 0, void 0, function* () {
         const options = new chrome_1.Options();
         options.addArguments('--disable-blink-features=AutomationControlled');
+        options.addArguments('--use-fake-ui-for-media-stream');
         let driver = yield new selenium_webdriver_1.Builder().forBrowser(selenium_webdriver_1.Browser.CHROME).setChromeOptions(options).build();
         try {
             yield driver.get('https://meet.google.com/yrm-pvbi-ohk?hs=193&hs=187&ijlm=1734417497293&adhoc=1');
-            // await driver.findElement(By.name('q')).sendKeys('webdriver', Key.RETURN)
-            yield driver.wait(selenium_webdriver_1.until.titleIs('webdriver - Google Search'), 10000);
+            console.log("Site opened");
+            yield driver.sleep(6000);
+            console.log("Passed here.");
+            const text = yield driver.findElement(selenium_webdriver_1.By.id('c11')).sendKeys("Testing", selenium_webdriver_1.Key.ENTER);
+            yield driver.sleep(6000);
+            // if (text) {
+            //   console.log("This is text : ", text)
+            // }
         }
         finally {
             yield driver.quit();
