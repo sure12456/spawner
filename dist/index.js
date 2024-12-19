@@ -11,26 +11,93 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 const selenium_webdriver_1 = require("selenium-webdriver");
 const chrome_1 = require("selenium-webdriver/chrome");
-function main() {
+function openMeet(driver) {
+    return __awaiter(this, void 0, void 0, function* () {
+        try {
+            yield driver.get('https://meet.google.com/yib-wpcv-mgk');
+            yield driver.wait(selenium_webdriver_1.until.elementLocated(selenium_webdriver_1.By.xpath('//span[contains(text(), "Got it")]')), 10000).click();
+            yield driver.wait(selenium_webdriver_1.until.elementLocated(selenium_webdriver_1.By.id('c11')), 10000).sendKeys("Testing1");
+            yield driver.wait(selenium_webdriver_1.until.elementLocated(selenium_webdriver_1.By.xpath('//span[contains(text(), "Ask to join")]')), 10000).click();
+        }
+        finally {
+            // await driver.quit()
+        }
+    });
+}
+function getDriver() {
     return __awaiter(this, void 0, void 0, function* () {
         const options = new chrome_1.Options();
         options.addArguments('--disable-blink-features=AutomationControlled');
         options.addArguments('--use-fake-ui-for-media-stream');
+        // options.addArguments('--auto-select-desktop-capture-source=[RECORD]')
+        // options.addArguments('--window-size=1080,720')
+        // options.addArguments('--enable-usermedia-screen-capturing')
         let driver = yield new selenium_webdriver_1.Builder().forBrowser(selenium_webdriver_1.Browser.CHROME).setChromeOptions(options).build();
-        try {
-            yield driver.get('https://meet.google.com/yrm-pvbi-ohk?hs=193&hs=187&ijlm=1734417497293&adhoc=1');
-            // await driver.sleep(6000)
-            // await driver.findElement(By.id('c11')).sendKeys("Testing")
-            yield driver.wait(selenium_webdriver_1.until.elementLocated(selenium_webdriver_1.By.xpath('//span[contains(text(), "Got it")]')), 10000).click();
-            yield driver.wait(selenium_webdriver_1.until.elementLocated(selenium_webdriver_1.By.id('c11')), 10000).sendKeys("Testing1");
-            yield driver.wait(selenium_webdriver_1.until.elementLocated(selenium_webdriver_1.By.xpath('//input[@id="c11"]')), 10000).sendKeys("Testing2");
-            yield driver.wait(selenium_webdriver_1.until.elementLocated(selenium_webdriver_1.By.xpath('//input[@placeholder="Your name"]')), 10000).sendKeys("Testing3");
-            yield driver.sleep(600000);
-            //*[@id="c11"]
+        return driver;
+    });
+}
+function startScreenshare(driver) {
+    return __awaiter(this, void 0, void 0, function* () {
+        console.log("In startScreenshare");
+        const response = yield driver.executeScript(`
+
+    function wait(delayInMS) {
+      return new Promise((resolve) => setTimeout(resolve, delayInMS));
+    }
+
+    function startRecording(stream, lengthInMS) {
+      let recorder = new MediaRecorder(stream);
+      let data = [];
+
+      recorder.ondataavailable = (event) => data.push(event.data);
+      recorder.start();
+
+      let stopped = new Promise((resolve, reject) => {
+        recorder.onstop = resolve;
+        recorder.onerror = (event) => reject(event.name);
+      });
+
+
+      let recorded = wait(lengthInMS).then(() => {
+        if (recorder.state === 'recording') {
+          recorder.stop();
         }
-        finally {
-            yield driver.quit();
-        }
+      });
+
+    return Promise.all([stopped, recorded]).then(() => data);
+
+  }
+
+  console.log("Before Entering mediaDevice")
+
+  window.navigator.mediaDevices.getDisplayMedia({
+    video: true,
+    audio: false,
+    preferCurrentTab: true,
+  }).then(async stream => {
+    console.log("Stream Started now")
+    const recordedChunks = await startRecording(stream, 30000);
+    console.log("Recording started")
+
+    let recordedBlob = new Blob(recordedChunks, { type: "video/webm" });
+    const recording = document.createElement("video");
+    recording.src = URL.createObjectURL(recordedBlob);
+
+    const downloadButton = document.createElement("a");
+    downloadButton.href = recording.src;
+    downloadButton.download = "RecordedVideo.webm";
+    downloadButton.click();
+    console.log("Download button clicked")
+  }) 
+  `);
+        // await driver.sleep(600000)
+    });
+}
+function main() {
+    return __awaiter(this, void 0, void 0, function* () {
+        const driver = yield getDriver();
+        yield openMeet(driver);
+        yield startScreenshare(driver);
     });
 }
 main();
