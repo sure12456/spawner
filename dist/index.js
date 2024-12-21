@@ -14,7 +14,7 @@ const chrome_1 = require("selenium-webdriver/chrome");
 function openMeet(driver) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            yield driver.get('https://meet.google.com/yib-wpcv-mgk');
+            yield driver.get('https://meet.google.com/rgv-jfxg-zqn');
             yield driver.wait(selenium_webdriver_1.until.elementLocated(selenium_webdriver_1.By.xpath('//span[contains(text(), "Got it")]')), 10000).click();
             yield driver.wait(selenium_webdriver_1.until.elementLocated(selenium_webdriver_1.By.id('c11')), 10000).sendKeys("Testing1");
             yield driver.wait(selenium_webdriver_1.until.elementLocated(selenium_webdriver_1.By.xpath('//span[contains(text(), "Ask to join")]')), 10000).click();
@@ -71,12 +71,34 @@ function startScreenshare(driver) {
   console.log("Before Entering mediaDevice")
 
   window.navigator.mediaDevices.getDisplayMedia({
-    video: true,
+    video: {
+      displaySurface: "browser"
+    },
     audio: false,
     preferCurrentTab: true,
   }).then(async stream => {
+
+    // console.log("audio logic start");
+    // const audioContext = new AudioContext();
+    // const screenAudioStream = audioContext.createMediaStreamSource(stream)
+    // const audiosrc1 = document.querySelectorAll("audio")[0];
+    // const audiosrc2 = document.querySelectorAll("audio"")[1];
+    // const audiosrc3 = document.querySelectorAll("audio")[2];
+
+    // const audioStream1 = audioContext.createMediaStreamSource(audiosrc1.srcObject);
+    // const audioStream2 = audioContext.createMediaStreamSource(audiosrc2.srcObject);
+    // const audioStream3 = audioContext.createMediaStreamSource(audiosrc3.srcObject);
+    
+    // const dest = audioContext.createMediaStreamDestination();
+
+    // screenAudioStream.connect(dest);
+    // audioStream1.connect(dest);
+    // audioStream2.connect(dest);
+    // audioStream3.connect(dest);
+
+
     console.log("Stream Started now")
-    const recordedChunks = await startRecording(stream, 30000);
+    const recordedChunks = await startRecording(stream, 10000);
     console.log("Recording started")
 
     let recordedBlob = new Blob(recordedChunks, { type: "video/webm" });
